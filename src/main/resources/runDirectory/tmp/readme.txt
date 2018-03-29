@@ -1,0 +1,1 @@
+This directory is used as a temp directory by certificate generation.

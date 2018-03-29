@@ -1,0 +1,211 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ace="http://www.icefaces.org/icefaces/components"
+	xmlns:ice="http://www.icesoft.com/icefaces/component">
+
+<body>
+
+	<ui:composition template="./layout/pageTemplate.xhtml">
+
+		<ui:define name="content">
+			<span style="color:red">The certificate generator has been 
+				updated to generate certificates for two certificate authorities:
+				<br/> <b>* MIR2014-16 (new):</b> which creates certificates for 2015 and
+			    2016 Connectathon and Pre-connectathon testing.
+			    <br/> <b>* MIR2012-14-2 (the old one):</b> which creates certificates
+			    for 2013 and 2014 testing.<br/>
+			    Testing tools will be updated over the next few weeks to use the
+			    new certificates. The old certificates will expire on or about
+			    October 30, 2014.
+			</span>
+			<ice:panelTabSet selectedIndex="#{sessionBean.selectedTab}"
+				tabChangeListener="#{sessionBean.tabChangeListener}">
+
+				<ice:panelTab label="Generate Test Certificates">
+					<ice:panelGroup id="log" rendered="#{sessionBean.showLog}">
+						Error Log:<br/>
+						<ice:outputText value="#{sessionBean.logMsg}"
+							escape="false"/>
+						<hr/>
+					</ice:panelGroup>
+					<ice:panelGroup>
+					<hr/>
+					<ice:panelGrid columns="2">
+
+						<ice:panelGrid columns="2" width="550px"
+							rowClasses="erlDef, erlDef, erlDef, erlDef, erlDef, erlDef, erlYellow">
+							<ice:outputLabel value="Certificate Authority" for="ca" />
+							<ice:selectOneMenu id="ca" style="width:200px"
+								value="#{sessionBean.cert.ca}">
+								<f:selectItems value="#{applicationBean.caNames}" />
+							</ice:selectOneMenu>
+							<ice:outputLabel value="[C] Country Name" for="country" />
+							<ice:inputText id="country" size="2" maxlength="2"
+								value="#{sessionBean.cert.country}" />
+							<ice:outputLabel value="[ST] State / Province" for="state" />
+							<ice:inputText id="state" size="25"
+								value="#{sessionBean.cert.stateProvince}" />
+							<ice:outputLabel value="[L] Locality" for="city" />
+							<ice:inputText id="city" size="25"
+								value="#{sessionBean.cert.city}" />
+							<ice:outputLabel value="[O] Organization Name" for="org" />
+							<ice:inputText id="org" size="30"
+								value="#{sessionBean.cert.organization}" />
+							<ice:outputLabel value="[OU] Organizational Unit Name" for="unit" />
+							<ice:inputText id="unit" size="25"
+								value="#{sessionBean.cert.unit}" />
+							<ice:outputLabel value="[CN] Common Name" for="name" />
+							<ice:panelGrid columns="2">
+								<ice:inputText id="name" size="25"
+									value="#{sessionBean.cert.name}" />
+								<ice:outputText value=".ihe-us-test.net"
+									style="font-weight:bold" />
+							</ice:panelGrid>
+							<ice:outputLabel value="Email Address" for="email" />
+							<ice:inputText id="email" size="25"
+								value="#{sessionBean.cert.email}" />
+
+							<ice:outputLabel value="Password" for="apw1" />
+							<ice:inputSecret id="apw1" size="25" value="#{sessionBean.pw1}" />
+							<ice:outputLabel value="Re-enter Password" for="apw2" />
+							<ice:inputSecret id="apw2" size="25" value="#{sessionBean.pw2}" />
+
+							<ice:commandButton id="reset" value="Reset"
+								actionListener="#{sessionBean.reset}" />
+							<ice:commandButton id="gen" rendered="#{sessionBean.state == 1}"
+								value="Generate Certificate"
+								actionListener="#{sessionBean.generateCertificate}" />
+							<ice:outputResource id="zip" rendered="#{sessionBean.state == 2}"
+								resource="#{sessionBean.zipResource}" type="button"
+								attachment="true" fileName="cert.zip"
+								label="Download certificate zip file" />
+						</ice:panelGrid>
+						<ice:panelGrid columns="1">
+                Welcome to IHE Connectathon and Pre-connectathon testing
+                certificate generation<p />
+                There are currently two test certificate authorities, MIR2014-16,
+                which generates certificates valid for 2015/16 Connectathons, and
+                which is already selected, and MIR2012-14-2, which generates the
+                old certificates.<br/> Enter the information for 
+                your own certificate in the boxes provided. The initial content 
+                of these boxes are meant to serve as examples.<p />
+							<ice:panelGroup style="background-color:yellow">
+                The value for CN will normally contain a hostname. The IHE 
+                Authenticate Node Transaction (ITI-19) does not require a valid 
+                hostname, but this is common practice. See ITI 2: 3.19.16.1 for 
+                a discussion of certificate validation. When you enter a value 
+                for CN, please restrict yourself to values in this set: [“a-z” 
+                “A-Z” “0-9” “-“]. Do not include periods, commas or other 
+                punctuation or special characters. We make these recommendations 
+                in order of preference for the value:<ol>
+									<li>If you have been assigned a hostname for Connectathon
+										testing, use that.</li>
+									<li>If you have been assigned a name for your system by
+										Gazelle, use that.</li>
+									<li>The hostname of the computer where you will install
+										this certificate.</li>
+								</ol>
+								<b>Note:</b> If your FQDN is tinker.acme.com, you would enter 
+				"tinker".<p />
+							</ice:panelGroup>
+                When the contents of the boxes are correct for your company,
+                click the "Generate Certificate" button. When you do so, a zip
+                file containing your certificates and other revelant files will
+                be generated.<p />
+                When the zip file has been generated, a download button will
+                appear. Download and unzip the file, then see the README.TXT
+                file for details.
+				</ice:panelGrid>
+					</ice:panelGrid>
+					</ice:panelGroup>
+				</ice:panelTab>
+
+				<ice:panelTab label="View Certificate Information">
+
+					<ice:panelGrid columns="1">
+
+						<ice:panelGrid columns="2">
+
+							<ice:panelGrid columns="2" style="border-style:solid; border-width:1px">
+
+								<ice:outputLabel for="ctype" value="Type of Certificate to View" />
+								<ice:selectOneMenu id="ctype" partialSubmit="true"
+									value="#{sessionBean.certType}">
+									<f:selectItems value="#{sessionBean.certTypes}" />
+								</ice:selectOneMenu>
+
+								<ice:panelGrid rendered="#{sessionBean.pwNeeded}" columns="2">
+									<ice:outputText value="password" />
+									<ice:inputSecret rendered="#{not sessionBean.showPassword}"
+										value="#{sessionBean.password}" />
+									<ice:inputText rendered="#{sessionBean.showPassword}"
+										value="#{sessionBean.password}" />
+								</ice:panelGrid>
+
+								<ice:panelGrid rendered="#{sessionBean.pwNeeded}" columns="2">
+									<ice:outputLabel for="show" value="Show Password?" />
+									<ice:selectBooleanCheckbox id="show"
+										value="#{sessionBean.showPassword}" partialSubmit="true" />
+								</ice:panelGrid>
+
+								<ace:fileEntry relativePath="/upload/"
+									fileEntryListener="#{sessionBean.viewFile}" required="true"
+									requiredMessage="must select a file" maxFileCount="1"
+									maxFileCountMessage="select only one file" maxFileSize="32768"
+									maxFileSizeMessage="file is too large" />
+
+								<h:commandButton type="submit" value="View File" />
+
+							</ice:panelGrid>
+
+							<ice:panelGrid columns="1" style="background-color:LightGrey">
+						Welcome to IHE Connectathon and pre-Connectathon test
+						certificate viewing, which is designed to help users view the
+						contents of common certificate files. Please proceed as follows:<ol>
+									<li>Select the Type of certificate you would like to view
+										from the dropdown list. Note: The file names given to each
+										certificate type in the cert.zip file are listed in the
+										dropdown.</li>
+									<li>If the type of certificate you wish to view requires a
+										password, a password entry will appear. Enter your password.
+										Note: This is in the password.txt file in your cert.zip file.
+										If you check the 'Show Password?' checkbox, the password will
+										be displayed.</li>
+									<li>When the correct certificate type (and password if
+										needed) are entered, click on the 'Choose File' button. A file
+										selection dialog will open.</li>
+									<li>Using the file selection dialog, navigate to the
+										certificate file you want to view, and select it. The dialog
+										will disappear and the selected file will appear next to the
+										'Choose File' button.</li>
+									<li>Click the 'View File' button to view the certificate
+										data. The data will appear, along with a 'Clear' button.</li>
+									<li>When you are finished viewing the certificate
+										information, click the 'Clear' button to reset the screen.</li>
+								</ol>
+							</ice:panelGrid>
+							</ice:panelGrid>
+
+							<ice:panelGrid rendered="#{sessionBean.viewStatus == 2}"
+								columns="1" style="background-color:Tan">
+								<pre style="width: 100%">
+								#{sessionBean.viewResults}
+								</pre>
+								<ice:commandButton value="Clear" immediate="true"
+									action="#{sessionBean.clearView}" />
+							</ice:panelGrid>
+
+						</ice:panelGrid>
+				</ice:panelTab>
+			</ice:panelTabSet>
+		</ui:define>
+
+	</ui:composition>
+
+</body>
+</html>
+
